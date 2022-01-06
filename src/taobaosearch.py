@@ -1,3 +1,4 @@
+import csv
 import requests
 import re
 from prettytable import PrettyTable
