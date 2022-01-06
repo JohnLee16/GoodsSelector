@@ -2,7 +2,7 @@ import requests
 import re
 from prettytable import PrettyTable
 import prettytable as pt
-from selenium import  webdriver
+from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import csv
@@ -67,19 +67,19 @@ def printGoodsList(ilist, num):
 
 
 def search_product(driver, keywords):
-
-    # driver.find_element_by_id('q').send_keys(keywords)
-    # click text box
+    driver.maximize_window()
+    # click text box 2022.01.05
     driver.find_element_by_class_name('_18v23kPu').click()
-    # find text box and fill
+    time.sleep(0.5)
+
+    # find text box and fill QahmZDd2
     search_text = driver.find_element_by_class_name('QahmZDd2')
     search_text.send_keys(keywords)
     search_text.send_keys(Keys.ENTER)
-
-
-    driver.maximize_window()
-    time.sleep(15)
-
+    count = 0
+    time.sleep(0.5)
+    items = driver.find_elements_by_class_name('RIo5XeMZ')
+    print(items)
     page = driver.find_elements_by_xpath('//*[@id="mainsrp-pager"]/div/div/div/div[1]')[0].text
     page = re.findall('(\d+)',page)[0]             #提取page中的数字
     return int(page)
@@ -87,24 +87,19 @@ def search_product(driver, keywords):
 # def pddlogin(username, password):
 
 
-def pddSearch():
-    goods = "充电宝"
-    depth = 4
-    start_url = "https://mobile.pinduoduo.com/search_result.html?search_key=" + goods + "&search_type=goods&source=index&options=1&search_met_track=manual&refer_page_el_sn=99884&refer_page_name=search_result&refer_page_id=10015_1641444931004_korqfk8hlr&refer_page_sn=10015"
+def pddSearch(name):
     infoList = []
-    num = 300
-
-    # initialize driver, and set chromedriver path
+    # initialize driver
     while 1:
         try:
             driver = webdriver.Chrome()
             break
-        except:
+        except Exception:
             time.sleep(1)
 
     # request page
     driver.get("https://mobile.pinduoduo.com/")
-    search_product(driver, "充电宝")
+    search_product(driver, name)
     # 通过page_source获取网页源代码
     print(driver.page_source)
 
@@ -117,4 +112,4 @@ def pddSearch():
             w.writerow(v)
     print("结束保存")
 
-pddSearch()
+pddSearch("充电宝")
