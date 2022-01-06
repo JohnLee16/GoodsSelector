@@ -78,8 +78,12 @@ def search_product(driver, keywords):
     search_text.send_keys(Keys.ENTER)
     count = 0
     time.sleep(0.5)
-    items = driver.find_elements_by_class_name('RIo5XeMZ')
-    print(items)
+    items_titles = driver.find_elements_by_class_name('PWKq3gf1')
+
+    items_names = driver.find_elements_by_class_name('fnpJrQyt KbqLm0ek')
+    items_price = driver.find_elements_by_class_name('_9D91bFn1')
+    items_salecount = driver.find_elements_by_class_name('jmOJMlWq')
+
     page = driver.find_elements_by_xpath('//*[@id="mainsrp-pager"]/div/div/div/div[1]')[0].text
     page = re.findall('(\d+)',page)[0]             #提取page中的数字
     return int(page)
