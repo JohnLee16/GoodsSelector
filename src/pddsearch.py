@@ -2,7 +2,7 @@ import requests
 import re
 from prettytable import PrettyTable
 import prettytable as pt
-from selenium import  webdriver
+from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import csv
@@ -26,6 +26,8 @@ def getHtmlText(url):
         r = requests.get(url, headers=header)
         r.raise_for_status()
         r.encoding = r.apparent_encoding
+
+
 
         return r.text
     except:
@@ -67,44 +69,75 @@ def printGoodsList(ilist, num):
 
 
 def search_product(driver, keywords):
-
-    # driver.find_element_by_id('q').send_keys(keywords)
-    # click text box
+    driver.maximize_window()
+    # click text box 2022.01.05
     driver.find_element_by_class_name('_18v23kPu').click()
-    # find text box and fill
+    time.sleep(0.5)
+
+    # find text box and fill QahmZDd2
     search_text = driver.find_element_by_class_name('QahmZDd2')
     search_text.send_keys(keywords)
     search_text.send_keys(Keys.ENTER)
+    count = 0
+    time.sleep(0.5)
+    items_titles = driver.find_elements_by_class_name('PWKq3gf1')
+
+    # find item info via find elements by class name
+    items_names = driver.find_elements_by_class_name('fnpJrQyt KbqLm0ek')
+    # items_price = driver.find_elements_by_class_name('_9D91bFn1')
+    # items_salecount = driver.find_elements_by_class_name('jmOJMlWq')
+
+    # find items info via xpath
+    # page = driver.find_elements_by_xpath('//*[@id="main"]')[0].text
+    # print(page)
+    page = driver.find_elements_by_xpath('//*[@class="RIo5XeMZ"]')[0].text
+    itemsname_list = []
+    time.sleep(0.5)
+    # fnpJrQyt
+    items_names = driver.find_elements_by_xpath('//*[@class="RIo5XeMZ"]')
+    for item in items_names:
+        print(item.text)
+        itemsname_list.append(item.text)
 
 
-    driver.maximize_window()
-    time.sleep(15)
+    
+    search_html = driver.find_element_by_tag_name('html')#获取对应标签
+    height=search_html.size['height'] * 21#获取html页面的总高度
+ 
+    for i in range(700,height,700):
+        s=f'window.scrollBy(0,700)'#每次划700的单位
+        driver.execute_script(s)   #向下滚动，0在第一位是向上向下，0在第二位是向左向右，负号决定具体方向
+        time.sleep(1.5)
 
-    page = driver.find_elements_by_xpath('//*[@id="mainsrp-pager"]/div/div/div/div[1]')[0].text
-    page = re.findall('(\d+)',page)[0]             #提取page中的数字
+    items_specs = driver.find_elements_by_xpath('//*[@class="NA5750pm"]')
+    itemsspecs_list = []
+    for spec in items_specs:
+        itemsspecs_list.append(spec.text)
+    items_price = driver.find_elements_by_xpath('//*[@class="_9D91bFn1"]')
+    price_list = []
+    for price in items_price:
+        price_list.append(price.text.replace('\n',''))
+
+
+    page = re.findall('(\d+)',page)[0]#提取page中的数字
     return int(page)
 
 # def pddlogin(username, password):
 
 
-def pddSearch():
-    goods = "充电宝"
-    depth = 4
-    start_url = "https://mobile.pinduoduo.com/search_result.html?search_key=" + goods + "&search_type=goods&source=index&options=1&search_met_track=manual&refer_page_el_sn=99884&refer_page_name=search_result&refer_page_id=10015_1641444931004_korqfk8hlr&refer_page_sn=10015"
+def pddSearch(name):
     infoList = []
-    num = 300
-
-    # initialize driver, and set chromedriver path
+    # initialize driver
     while 1:
         try:
             driver = webdriver.Chrome()
             break
-        except:
+        except Exception:
             time.sleep(1)
 
     # request page
     driver.get("https://mobile.pinduoduo.com/")
-    search_product(driver, "充电宝")
+    search_product(driver, name)
     # 通过page_source获取网页源代码
     print(driver.page_source)
 
@@ -117,4 +150,4 @@ def pddSearch():
             w.writerow(v)
     print("结束保存")
 
-pddSearch()
+pddSearch("充电宝")
