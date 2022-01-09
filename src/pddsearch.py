@@ -80,12 +80,43 @@ def search_product(driver, keywords):
     time.sleep(0.5)
     items_titles = driver.find_elements_by_class_name('PWKq3gf1')
 
-    items_names = driver.find_elements_by_class_name('fnpJrQyt KbqLm0ek')
-    items_price = driver.find_elements_by_class_name('_9D91bFn1')
-    items_salecount = driver.find_elements_by_class_name('jmOJMlWq')
+    # find item info via find elements by class name
+    # items_names = driver.find_elements_by_class_name('fnpJrQyt KbqLm0ek')
+    # items_price = driver.find_elements_by_class_name('_9D91bFn1')
+    # items_salecount = driver.find_elements_by_class_name('jmOJMlWq')
 
-    page = driver.find_elements_by_xpath('//*[@id="mainsrp-pager"]/div/div/div/div[1]')[0].text
-    page = re.findall('(\d+)',page)[0]             #提取page中的数字
+    # find items info via xpath
+    # page = driver.find_elements_by_xpath('//*[@id="main"]')[0].text
+    # print(page)
+    page = driver.find_elements_by_xpath('//*[@class="RIo5XeMZ"]')[0].text
+    itemsname_list = []
+    time.sleep(0.5)
+    # fnpJrQyt
+    items_names = driver.find_elements_by_xpath('//*[@class="RIo5XeMZ"]')
+    for item in items_names:
+        print(item.text)
+        itemsname_list.append(item.text)
+
+
+    
+    search_html = driver.find_element_by_tag_name('html')#获取对应标签
+    height=search_html.size['height'] * 21#获取html页面的总高度
+ 
+    for i in range(700,height,700):
+        s=f'window.scrollBy(0,700)'#每次划700的单位
+        driver.execute_script(s)   #向下滚动，0在第一位是向上向下，0在第二位是向左向右，负号决定具体方向
+        time.sleep(1.5)
+
+    items_specs = driver.find_elements_by_xpath('//*[@class="NA5750pm"]')
+    itemsspecs_list = []
+    for spec in items_specs:
+        itemsspecs_list.append(spec.text)
+    items_price = driver.find_elements_by_xpath('//*[@class="_9D91bFn1"]')
+    price_list = []
+    for price in items_price:
+        price_list.append(price.text.replace('\n',''))
+
+    page = re.findall('(\d+)',page)[0]#提取page中的数字
     return int(page)
 
 # def pddlogin(username, password):
