@@ -81,7 +81,7 @@ def search_product(driver, keywords):
     items_titles = driver.find_elements_by_class_name('PWKq3gf1')
 
     # find item info via find elements by class name
-    # items_names = driver.find_elements_by_class_name('fnpJrQyt KbqLm0ek')
+    items_names = driver.find_elements_by_class_name('fnpJrQyt KbqLm0ek')
     # items_price = driver.find_elements_by_class_name('_9D91bFn1')
     # items_salecount = driver.find_elements_by_class_name('jmOJMlWq')
 
@@ -115,6 +115,7 @@ def search_product(driver, keywords):
     price_list = []
     for price in items_price:
         price_list.append(price.text.replace('\n',''))
+
 
     page = re.findall('(\d+)',page)[0]#提取page中的数字
     return int(page)
