@@ -9,6 +9,14 @@ import time
 import csv
 from itertools import product
 
+def write_goods_info(filename, datalist):
+    print("--- start write to csv ---")
+    with open(filename + 'data.csv', 'a', encoding='utf-8-sig', newline='') as f:
+        w = csv.writer(f)
+        for v in datalist:
+            # print(v)
+            w.writerow(v)
+    print("--- finished save files ---")
 
 def login_page(driver):
     #footer-item-icon-wrap
@@ -171,12 +179,6 @@ def pddSearch(name, brand="", serial_number="", size="", color=""):
     print(driver.page_source)
 
 
-    print("开始保存")
-    with open("testdddddd" + 'data.csv', 'a', encoding='utf-8-sig', newline='') as f:
-        w = csv.writer(f)
-        for v in infoList:
-            # print(v)
-            w.writerow(v)
-    print("结束保存")
+    
 
 pddSearch("充电宝", "华为", "60W", "快充")
