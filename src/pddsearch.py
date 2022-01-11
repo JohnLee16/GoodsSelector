@@ -1,3 +1,4 @@
+from prettytable.prettytable import RANDOM
 import requests
 import re
 from prettytable import PrettyTable
@@ -6,23 +7,43 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import csv
-import itertools
+from itertools import product
+
 
 def login_page(driver):
-    user_name = '18682468446'
     #footer-item-icon-wrap
     footer_items = driver.find_elements_by_xpath('//*[@class="footer-item-icon-wrap"]')
-    footer_items[len(footer_items) - 1].click()
-    driver.find_element_by_xpath('//*[@class="phone-login"]').click()
+    try:
+        # find "个人中心" to login
+        footer_items[len(footer_items) - 1].click()
+        time.sleep(0.5)
+    except:
+        pass
 
-    driver.find_element_by_id('user-mobile').send_keys(user_name)
-    driver.find_element_by_id('code-button').click()
-    pincode_input = driver.find_element_by_id('input-code')
-    
+    try :
+        driver.find_element_by_class_name('personal-section')
+        footer_items = driver.find_elements_by_xpath('//*[@class="footer-item-icon-wrap"]')
+        footer_items[0].click()
+        time.sleep(0.5)
+    except BaseException:
+        # click using phone number to login
+        driver.find_element_by_xpath('//*[@class="phone-login"]').click()
+        time.sleep(0.5)
+        # fill mobile number and manually input the pin code
+        phonenumber = input('please input your phone number: ')
+        driver.find_element_by_id('user-mobile').send_keys(phonenumber)
+        driver.find_element_by_id('code-button').click()
+        time.sleep(0.5)
+        pincode = input('Please input the pin code you have received from your phone: ')
+        pincode_input = driver.find_element_by_id('input-code').send_keys(pincode)
+        # submit-button
+        driver.find_element_by_id('submit-button').click()
+        time.sleep(0.5)
+        # find "主页" to show
+        footer_items[0].click()
+        time.sleep(0.5)
 
 def search_product(driver, keywords):
-    username = "18682468446"
-
     driver.maximize_window()
     # click text box 2022.01.05
     driver.find_element_by_class_name('_18v23kPu').click()
@@ -54,16 +75,42 @@ def search_product(driver, keywords):
         pindan = driver.find_element_by_xpath('//*[@class="Qzax7E1w"]')
         pindan.click()
         time.sleep(0.5)
-        # various classification: r-mksVqr
-        skus = driver.find_elements_by_xpath('//*[@class="sku-specs-key"]') #sku-specs-key sku for goods
-        for sku in skus:
-        # color classification: qK4302ba
-        # selected specific type:tWGpNA2Y
-            ssr = sku.find_elements_by_xpath('.//div/*')
-            
-            # price of specific product: _27FaiT3N
-            price = driver.find_elements_by_xpath('//*[@class="_27FaiT3N"]')
+        # lSznZClW sku-plus1 exist to process skus, otherwise not necessary to process
 
+        # various classification: r-mksVqr
+        skus = driver.find_elements_by_class_name('r-mksVqr') # find_elements_by_xpath('//*[@class="sku-specs-key"]') # sku-specs-key sku for goods
+        sku_specs = []
+        for sku in skus:
+            # color classification: qK4302ba
+            # selected specific type:tWGpNA2Y  Test contains
+            sku_temp = sku.find_elements_by_xpath('.//div[@class = "tWGpNA2Y"]')
+            if len(sku_temp) == 0:
+                continue
+            else:
+                sku_specs.append(sku_temp)
+        
+        combin = []
+        price_list_diff_spec = []
+        spec_names = []
+        for spec in product(*sku_specs):
+            spec_name_temp = ""
+            for s in spec:
+                spec_name_temp += s.text
+                s.click()
+            # price of specific product: _27FaiT3N
+            price = driver.find_element_by_xpath('//*[@class="_27FaiT3N"]')
+            price_list_diff_spec.append(price.text)
+            spec_names.append(spec_name_temp)
+        
+        driver.back()
+        time.sleep(0.5)
+        driver.back()
+        time.sleep(0.5)
+        # return back to product page
+        
+        
+    # price: _27FaiT3N
+    # "确定" button
         
     itemsname_list = []
     time.sleep(0.5)
@@ -102,6 +149,7 @@ def search_product(driver, keywords):
 
 
 def pddSearch(name, brand="", serial_number="", size="", color=""):
+
     infoList = []
     # initialize driver
     option=webdriver.ChromeOptions()
