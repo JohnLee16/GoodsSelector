@@ -34,25 +34,34 @@ def login_page(driver):
         driver.find_element_by_class_name('personal-section')
         footer_items = driver.find_elements_by_xpath('//*[@class="footer-item-icon-wrap"]')
         footer_items[0].click()
-        time.sleep(0.5)
+        time.sleep(0.1)
     except BaseException:
         # click using phone number to login
         driver.find_element_by_xpath('//*[@class="phone-login"]').click()
-        time.sleep(0.5)
+        time.sleep(0.1)
         # fill mobile number and manually input the pin code
         phonenumber = input('please input your phone number: ')
         driver.find_element_by_id('user-mobile').send_keys(phonenumber)
         driver.find_element_by_id('code-button').click()
-        time.sleep(0.5)
+        time.sleep(0.1)
         pincode = input('Please input the pin code you have received from your phone: ')
         pincode_input = driver.find_element_by_id('input-code').send_keys(pincode)
         # submit-button
         driver.find_element_by_id('submit-button').click()
-        time.sleep(0.5)
-        # find "主页" to show
-        footer_items = driver.find_elements_by_xpath('//*[@class="footer-item-icon-wrap"]')
-        footer_items[0].click()
-        time.sleep(0.5)
+        time.sleep(0.2)
+        # alert-app-download-head
+        try: 
+            driver.find_element_by_class_name("alert-app-download-head")
+            driver.find_element_by_class_name("alert-goto-app-cancel").click()
+            time.sleep(0.2)
+        except Exception:
+            print("--- No alert app download page show up! ---")
+        finally:
+            # find "主页" to show
+            footer_items = driver.find_elements_by_xpath('//*[@class="footer-item-icon-wrap"]')
+            footer_items[0].click()
+            time.sleep(0.2)
+        
 
 
 def search_product(driver, keywords):
@@ -81,16 +90,25 @@ def search_product(driver, keywords):
 
     # get all items only 22, one page "RIo5XeMZ" specific product:VGc5+Y0S a9bD-5Ut
     items = driver.find_elements_by_xpath('//*[@class="VGc5+Y0S a9bD-5Ut"]')
+    small_product = True if len(items) != 0 else False
+    if not small_product:
+        items = driver.find_elements_by_xpath('//*[@class="RIo5XeMZ"]')
+        small_product = False    
+    
     len_of_items = len(items)
+    
     # ** details of product: _2sHFeg0q
     for i in range(len_of_items):
         item_name = items[i].text
-        items[i].click()        
+        items[i].click()
         time.sleep(0.5)
-        # find the "发起拼单" Qzax7E1w
-        pindan = driver.find_element_by_xpath('//*[@class="Qzax7E1w"]')
-        pindan.click()
-        time.sleep(0.5)
+        try:
+            # find the "发起拼单" Qzax7E1w
+            pindan = driver.find_element_by_xpath('//*[@class="Qzax7E1w"]')
+            pindan.click()
+            time.sleep(0.5)
+        except Exception:
+            continue
         # lSznZClW sku-plus1 exist to process skus, otherwise not necessary to process
 
         # various classification: r-mksVqr
@@ -105,7 +123,10 @@ def search_product(driver, keywords):
                 continue
             else:
                 sku_specs.append(sku_temp)
-                last_selected.append("")
+                if len(sku_temp) == 1:
+                    last_selected.append(sku_temp[0].text)
+                else:
+                    last_selected.append("")
         
         combin = []
         price_list_diff_spec = []
@@ -140,10 +161,10 @@ def search_product(driver, keywords):
         
         driver.back()
         time.sleep(0.5)        
-        items = driver.find_elements_by_xpath('//*[@class="VGc5+Y0S a9bD-5Ut"]')
+        items = driver.find_elements_by_xpath('//*[@class="VGc5+Y0S a9bD-5Ut"]') if small_product else driver.find_elements_by_xpath('//*[@class="RIo5XeMZ"]')
 
     driver.back()
-    time.sleep(0.5)
+    time.sleep(0.1)
         # return back to product page
         
         
@@ -189,12 +210,12 @@ def pddSearch(name, brand="", serial_number="", size="", color=""):
 
     infoList = []
     # initialize driver
-    # option=webdriver.ChromeOptions()
-    # user_data_dir=r'..\AppData\Local\Google\Chrome\User Data'
-    # option.add_argument(f'--user-data-dir={user_data_dir}')
+    option=webdriver.ChromeOptions()
+    user_data_dir=r'C:\Users\Home_JLI\AppData\Local\Google\Chrome\User Data'
+    option.add_argument(f'--user-data-dir={user_data_dir}')
     while 1:
         try:
-            driver = webdriver.Chrome()
+            driver = webdriver.Chrome(options=option)
             break
         except Exception:
             time.sleep(1)
@@ -211,4 +232,4 @@ def pddSearch(name, brand="", serial_number="", size="", color=""):
 
     
 
-pddSearch("充电宝", "华为", "60W", "快充")
+pddSearch("液晶电视", "小米", "43寸")
