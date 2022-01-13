@@ -211,7 +211,8 @@ def pddSearch(name, brand="", serial_number="", size="", color=""):
     infoList = []
     # initialize driver
     option=webdriver.ChromeOptions()
-    user_data_dir=r'C:\Users\Home_JLI\AppData\Local\Google\Chrome\User Data'
+    # !! please input path of your user data
+    user_data_dir=r'..\AppData\Local\Google\Chrome\User Data'
     option.add_argument(f'--user-data-dir={user_data_dir}')
     while 1:
         try:
