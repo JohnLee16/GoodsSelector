@@ -50,6 +50,7 @@ def login_page(driver):
         driver.find_element_by_id('submit-button').click()
         time.sleep(0.5)
         # find "主页" to show
+        footer_items = driver.find_elements_by_xpath('//*[@class="footer-item-icon-wrap"]')
         footer_items[0].click()
         time.sleep(0.5)
 
@@ -81,6 +82,7 @@ def search_product(driver, keywords):
     # get all items only 22, one page "RIo5XeMZ" specific product:VGc5+Y0S a9bD-5Ut
     items = driver.find_elements_by_xpath('//*[@class="VGc5+Y0S a9bD-5Ut"]')
     len_of_items = len(items)
+    # ** details of product: _2sHFeg0q
     for i in range(len_of_items):
         item_name = items[i].text
         items[i].click()        
@@ -94,6 +96,7 @@ def search_product(driver, keywords):
         # various classification: r-mksVqr
         skus = driver.find_elements_by_class_name('r-mksVqr') # find_elements_by_xpath('//*[@class="sku-specs-key"]') # sku-specs-key sku for goods
         sku_specs = []
+        last_selected = []
         for sku in skus:
             # color classification: qK4302ba
             # selected specific type:tWGpNA2Y  Test contains
@@ -102,22 +105,31 @@ def search_product(driver, keywords):
                 continue
             else:
                 sku_specs.append(sku_temp)
+                last_selected.append("")
         
         combin = []
         price_list_diff_spec = []
         spec_names = []
+        
         for spec in product(*sku_specs):
             spec_name_temp = ""
             effect = True
             # class name with this: tWGpNA2Y L6GSrkxz, unclickable
+            index_of_selected = 0
             for s in spec:
                 spec_name_temp += s.text
-                try:
-                    s.click()
-                except:
-                    effect = False
-                    spec_name_temp.replace(s.text, "") 
-                    break
+                if last_selected[index_of_selected] != s.text:
+                    last_selected[index_of_selected] = s.text
+                    try:
+                        s.click()
+                    except:
+                        effect = False
+                        spec_name_temp.replace(s.text, "") 
+                        break
+                else:
+                    index_of_selected += 1
+                    continue
+                index_of_selected += 1
                 
             if effect:
                 # price of specific product: _27FaiT3N
@@ -177,12 +189,12 @@ def pddSearch(name, brand="", serial_number="", size="", color=""):
 
     infoList = []
     # initialize driver
-    option=webdriver.ChromeOptions()
-    user_data_dir=r'C:\Users\Home_JLI\AppData\Local\Google\Chrome\User Data'
-    option.add_argument(f'--user-data-dir={user_data_dir}')
+    # option=webdriver.ChromeOptions()
+    # user_data_dir=r'..\AppData\Local\Google\Chrome\User Data'
+    # option.add_argument(f'--user-data-dir={user_data_dir}')
     while 1:
         try:
-            driver = webdriver.Chrome(options=option)
+            driver = webdriver.Chrome()
             break
         except Exception:
             time.sleep(1)
