@@ -25,6 +25,7 @@ def getHtmlText(url):
         r.encoding = r.apparent_encoding
 
         return r.text
+    # test commit
     except:
         print("爬取失败")
         return ""
